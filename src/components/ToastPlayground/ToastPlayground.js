@@ -1,5 +1,5 @@
 import React from 'react';
-import Toast from '../Toast';
+import ToastShelf from '../ToastShelf/ToastShelf';
 import Button from '../Button';
 
 import styles from './ToastPlayground.module.css';
@@ -9,15 +9,27 @@ const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 function ToastPlayground() {
   const [toastMessage, setToastMessage] = React.useState('');
   const [toastVariant, setToastVariant] = React.useState(VARIANT_OPTIONS[0]);
-  const [showToast, setShowToast] = React.useState(false);
+  const [toastList, setToastList] = React.useState([]);
+  const close = React.useCallback((id) => {
+    setToastList((currentToastList) => currentToastList.filter((toast) => toast.id !== id));
+  } ,[setToastList]);
 
-  function handleClick() {
-    setShowToast(true);
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (!toastMessage) {
+      return;
+    }
+
+    const newToast = {
+      id: crypto.randomUUID(),
+      message: toastMessage,
+      variant: toastVariant,
+      close: close,
+    }
+    const nextToastList = [...toastList, newToast];
+    setToastList(nextToastList);
+    setToastMessage('');
   }
-
-  const close = React.useCallback(() => {
-    setShowToast(false);
-  },[])
 
   return (
     <div className={styles.wrapper}>
@@ -26,16 +38,9 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      {showToast && (
-        <Toast
-          variant={toastVariant}
-          close={close}
-        >
-          {toastMessage}
-        </Toast>
-      )}
+      <ToastShelf toastList={toastList} />
 
-      <div className={styles.controlsWrapper}>
+      <form className={styles.controlsWrapper} onSubmit={handleSubmit}>
         <div className={styles.row}>
           <label
             htmlFor="message"
@@ -82,10 +87,10 @@ function ToastPlayground() {
           <div
             className={`${styles.inputWrapper} ${styles.radioWrapper}`}
           >
-            <Button onClick={handleClick}>Pop Toast!</Button>
+            <Button>Pop Toast!</Button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
