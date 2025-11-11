@@ -19,6 +19,16 @@ function ToastProvider({ children }) {
     });
   },[setToastList, close]);
 
+  React.useEffect(() => {
+    function escapeToClose(event) {
+      if (event.key === 'Escape') {
+        setToastList([]);
+      }
+    }
+    window.addEventListener('keydown', escapeToClose);
+    return () => window.removeEventListener()
+  }, [])
+
   return (
     <ToastContext value={{
       toastList,
