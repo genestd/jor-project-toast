@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Toast from '../Toast';
 import Button from '../Button';
 
 import styles from './ToastPlayground.module.css';
@@ -9,17 +9,31 @@ const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 function ToastPlayground() {
   const [toastMessage, setToastMessage] = React.useState('');
   const [toastVariant, setToastVariant] = React.useState(VARIANT_OPTIONS[0]);
+  const [showToast, setShowToast] = React.useState(false);
 
   function handleClick() {
-    console.log(`Popping toast: ${toastVariant} - ${toastMessage}`);
-    setToastMessage('');
+    setShowToast(true);
   }
+
+  const close = React.useCallback(() => {
+    setShowToast(false);
+  },[])
+
   return (
     <div className={styles.wrapper}>
       <header>
         <img alt="Cute toast mascot" src="/toast.png" />
         <h1>Toast Playground</h1>
       </header>
+
+      {showToast && (
+        <Toast
+          variant={toastVariant}
+          close={close}
+        >
+          {toastMessage}
+        </Toast>
+      )}
 
       <div className={styles.controlsWrapper}>
         <div className={styles.row}>
